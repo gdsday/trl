@@ -47,7 +47,7 @@ please choose which section you want to use:"""
     else:
         await message.reply_text("You have no permission!")
         LOGGER.warning(
-            f"uid={message.from_user.id} have no permission to edit rclone config!"
+            f"uid={message.from_user.id} have no permission to edit rclone config!\nExpecting:{OWNER_ID}"
         )
 
 
