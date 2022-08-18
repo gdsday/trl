@@ -1,0 +1,45 @@
+version: '3.4'
+services:
+  protonvpn:
+    container_name: protonvpn
+    environment:
+      # Credentials
+      PROTONVPN_USERNAME: ${PROTONVPN_USERNAME}
+      PROTONVPN_PASSWORD: ${PROTONVPN_PASSWORD}
+      # Override these where applicable
+      PROTONVPN_SERVER: ${PROTONVPN_SERVER:-NL}
+      PROTONVPN_TIER: ${PROTONVPN_TIER:-0}
+    # Always use semver tags, avoid using tag latest!
+    image: ghcr.io/tprasadtp/protonvpn:latest
+    restart: unless-stopped
+    networks:
+      - internet
+      - proxy
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    # Expose pyload container's port here!
+    expose:
+      - 6800
+  # Your app using the VPN
+  # Here we use pyload as an example
+  torrentleechX:
+    depends_on:
+      - protonvpn
+    container_name: torrentleech-gdrive
+    environment:
+      TG_BOT_TOKEN: ${TG_BOT_TOKEN}
+      APP_ID: ${APP_ID}
+      API_HASH: ${API_HASH}
+      OWNER_ID: ${OWNER_ID}
+      AUTH_CHANNEL: ${AUTH_CHANNEL}
+    image: ghcr.io/kangershub/torrentleechx:latest
+    restart: unless-stopped
+    network_mode: service:protonvpn
+volumes:
+  config:
+networks:
+  internet:
+  proxy:
+    internal: true
